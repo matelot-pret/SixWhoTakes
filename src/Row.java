@@ -6,18 +6,31 @@ import java.util.function.ToIntFunction;
 
 public class Row<T extends Comparable<T>> implements RowInterface<T> {
 
-    private Cell head;
-    private int nbItems;
-    private final static int NB_ITEMS_MAX = 5;
+    private Cell head; // premier élément de la ligne
+    private Cell queue;// dernier élément de la ligne
+    private int nbItems;// nombre d'éléments dans la ligne. Si > 0 : donc head != null, si > 1 : head != null ET head != queue, si == 1 : head == queue
 
+    public Row(){
+        head = null;
+        queue = null;
+        nbItems = 0;
+    }
     /**
      * adds an item at the end of the row preserving the natural ordering of its elements
      * @param item the item to add, the item must not be null
-     * @throws NotIncreasingException if the item is note greater than the last item of the row
+     * @throws NotIncreasingException if the item is not greater than the last item of the row
      * @throws NullPointerException if the item is null
      */
     @Override
     public void addItem(T item) throws NotIncreasingException{
+
+        if(item.compareTo(queue.data) <= 0){//le NullpointerException est lancé ici si item est null
+            throw new NotIncreasingException();
+        }
+
+        Cell cell = new Cell(item);
+        queue.next = cell;
+        nbItems ++;
 
     }
 
@@ -34,7 +47,19 @@ public class Row<T extends Comparable<T>> implements RowInterface<T> {
      */
     @Override
     public T[] remove(int nb) throws NotAvailableException{
-        return null;
+        if(nb < 0){
+            throw new IllegalArgumentException();
+        }
+        if(nb > nbItems){
+            throw new NotAvailableException();
+        }
+        T[] items = (T[]) new Comparable[nb];
+
+        for (int i = 0; i < nb; i++) {
+            items[i] = this.remove();
+        }
+
+        return items;
     }
 
     /**
@@ -44,7 +69,14 @@ public class Row<T extends Comparable<T>> implements RowInterface<T> {
      */
     @Override
     public T remove() throws EmptyException{
-        return null;
+        if(nbItems == 0){
+            throw new EmptyException();
+        }
+        T item = head.data;
+        head = head.next;
+
+        nbItems --;
+        return item;
     }
 
     /**
@@ -53,7 +85,7 @@ public class Row<T extends Comparable<T>> implements RowInterface<T> {
      */
     @Override
     public int nbItems(){
-        return 0;
+        return nbItems;
     }
 
     /**
@@ -63,7 +95,11 @@ public class Row<T extends Comparable<T>> implements RowInterface<T> {
      */
     @Override
     public T getLastItem() throws EmptyException{
-        return null;
+        if(nbItems == 0){
+            throw new EmptyException();
+        }
+
+        return queue.data;
     }
 
     /**
@@ -74,11 +110,26 @@ public class Row<T extends Comparable<T>> implements RowInterface<T> {
      */
     @Override
     public int sumToInt(ToIntFunction<? super T> mapper){
-        return 0;
+        if(mapper == null){
+            throw new NullPointerException();
+        }
+        int sum = 0;
+
+        Cell current = head;
+        while(current != null) {
+            sum += mapper.applyAsInt(current.data);
+            current = current.next;
+        }
+
+        return sum;
     }
 
     public class Cell{
-        private T x;
+        private T data;
         private Cell next;
+
+        public Cell(T data){
+            this.data = data;
+        }
     }
 }
