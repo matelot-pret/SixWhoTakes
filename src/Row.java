@@ -8,7 +8,7 @@ public class Row<T extends Comparable<T>> implements RowInterface<T> {
 
     private Cell head; // premier élément de la ligne
     private Cell queue;// dernier élément de la ligne
-    private int nbItems;// nombre d'éléments dans la ligne. Si > 0 : donc head != null, si > 1 : head != null ET head != queue, si == 1 : head == queue
+    private int nbItems;// nombre d'éléments dans la ligne. nbItems >= 0. Si nbItems == 0 : head == null ET queue == null Si nbItems > 0 : head != null, si nbItems > 1 : head != null ET head != queue, si nbItems == 1 : head == queue
 
     public Row(){
         head = null;
@@ -23,13 +23,22 @@ public class Row<T extends Comparable<T>> implements RowInterface<T> {
      */
     @Override
     public void addItem(T item) throws NotIncreasingException{
-
-        if(item.compareTo(queue.data) <= 0){//le NullpointerException est lancé ici si item est null
-            throw new NotIncreasingException();
+        if(item == null){//garantir le respect de la promesse de la javadoc
+            throw new NullPointerException();
+        }
+        if(nbItems > 0) {
+            if (item.compareTo(queue.data) <= 0) {
+                throw new NotIncreasingException();
+            }
+            Cell cell = new Cell(item);
+            queue.next = cell;
+            queue = queue.next;
+        }else{
+            Cell cell = new Cell(item);
+            queue = cell;
+            head = cell;
         }
 
-        Cell cell = new Cell(item);
-        queue.next = cell;
         nbItems ++;
 
     }
@@ -75,7 +84,11 @@ public class Row<T extends Comparable<T>> implements RowInterface<T> {
         T item = head.data;
         head = head.next;
 
+
         nbItems --;
+        if(nbItems < 1){
+            queue = null;
+        }
         return item;
     }
 
@@ -111,7 +124,7 @@ public class Row<T extends Comparable<T>> implements RowInterface<T> {
     @Override
     public int sumToInt(ToIntFunction<? super T> mapper){
         if(mapper == null){
-            throw new NullPointerException();
+            throw new NullPointerException();//exception lancée dans tous les cas.
         }
         int sum = 0;
 
