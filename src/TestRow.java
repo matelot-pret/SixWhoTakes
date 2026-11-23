@@ -1,11 +1,7 @@
-import Exceptions.EmptyException;
-import Exceptions.NotAvailableException;
-import Exceptions.NotIncreasingException;
+import Exceptions.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.function.ToIntFunction;
 
 public class TestRow {
@@ -52,11 +48,12 @@ public class TestRow {
         fillRow();
         Assertions.assertThrows(NotAvailableException.class, ()-> {row.remove(10);});
         Assertions.assertThrows(IllegalArgumentException.class, () -> {row.remove(-1);});
-        row.remove(0);
+        tab = row.remove(0);
         int nbElements = nbElements(tab);
         Assertions.assertEquals(0, nbElements);
         tab = row.remove(3);
-        Assertions.assertEquals(3, tab.length);
+        nbElements = nbElements(tab);
+        Assertions.assertEquals(3, nbElements);
         Assertions.assertEquals(20, tab[0]);
         Assertions.assertEquals(3, row.nbItems());
         emptyRow();

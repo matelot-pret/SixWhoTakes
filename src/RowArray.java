@@ -8,10 +8,10 @@ public class RowArray<T extends Comparable<T>> implements RowInterface<T>{
 
     private T[] items;
     private int nbItems;// nombre d'éléments dans le tableau. Si nbItems == 0 : le tableau est vide.
-    //le dernier éléments du tableau se trouve toujours à nbItems -1. nbItems >= items.length
+    //le dernier éléments du tableau se trouve toujours à nbItems -1. nbItems <= items.length
 
-    public RowArray(int capacite){
-        items = (T[]) new Comparable[capacite];
+    public RowArray(){
+        items = null;
         this.nbItems = 0;
     }
 
@@ -28,7 +28,8 @@ public class RowArray<T extends Comparable<T>> implements RowInterface<T>{
         }//O(1)
 
         if(nbItems > 0) {
-            //si le tableau est vide item sera le premier élément donc pas besoin de verifier
+            //si le tableau est vide item sera le premier élément
+            // donc pas besoin de verifier si il est plus grand que le dernier élément
             if (item.compareTo(items[nbItems - 1]) <= 0) {
                 throw new NotIncreasingException();
             }//O(1)
@@ -44,7 +45,9 @@ public class RowArray<T extends Comparable<T>> implements RowInterface<T>{
             }//O(1)
         }//O(1)
 
-
+        if(items == null){
+            items = (T[]) new Comparable[6];
+        }
 
         //un élément n'est ajouté que s'il est plus grand que le dernier élément
         items[nbItems] = item;//O(1)
@@ -76,9 +79,9 @@ public class RowArray<T extends Comparable<T>> implements RowInterface<T>{
         T[] tab = (T[]) new Comparable[nb];//O(1)
         for(int i = 0; i < nb; i++){
             try {
-                items[i] = this.remove();
+                tab[i] = this.remove();
             }catch (EmptyException ex){
-                //ne fait rien
+                throw new NotAvailableException();
             }
         }////O(1) si nb == 0 sinon O(n)
 
