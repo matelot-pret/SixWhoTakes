@@ -1,6 +1,9 @@
 import Exceptions.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
+import java.util.function.ToIntFunction;
+
 public class TestRowArray {
     RowArray<Integer> row = new RowArray<>();
 
@@ -55,6 +58,52 @@ public class TestRowArray {
         Assertions.assertEquals(3, nbElements);
         Assertions.assertEquals(20, tab[0]);
         Assertions.assertEquals(3, row.nbItems());
+        emptyRow();
+    }
+
+    @Test
+    void testRemoveElement() throws EmptyException, NotIncreasingException{
+        Assertions.assertThrows(EmptyException.class, () -> {row.remove();});
+        fillRow();
+        Assertions.assertEquals(20, row.remove());
+        Assertions.assertEquals(5, row.nbItems());
+        emptyRow();
+        row.addItem(25);
+        Assertions.assertEquals(25,row.remove().intValue());
+        Assertions.assertThrows(EmptyException.class, () -> {row.remove();});//je pouvais aussi utiliser remove() et getLastItem()
+        Assertions.assertThrows(EmptyException.class, () -> {row.getLastItem();});
+    }
+
+    @Test
+    void testNbItems()throws NotIncreasingException, EmptyException{
+        Assertions.assertEquals(0, row.nbItems());
+        fillRow();
+        Assertions.assertEquals(6, row.nbItems());
+        emptyRow();
+    }
+
+    @Test
+    void testGetLastItem() throws EmptyException, NotIncreasingException{
+        Assertions.assertThrows(EmptyException.class, () -> {row.getLastItem();});
+        fillRow();
+        Assertions.assertEquals(36, row.getLastItem());
+        emptyRow();
+    }
+
+    @Test
+    void testSumToInt()throws NotIncreasingException, EmptyException{
+        fillRow();
+        int somme = 0;
+        int t = row.nbItems();
+        for(int i = 0; i < t; i++){
+            Integer nombre = row.remove().intValue();
+            somme += nombre.intValue();
+        }
+        ToIntFunction<Integer> converter = Integer::intValue;
+        emptyRow();
+        fillRow();
+        Assertions.assertEquals(somme, row.sumToInt(converter));
+        Assertions.assertThrows(NullPointerException.class, () -> {row.sumToInt(null);});
         emptyRow();
     }
 }
