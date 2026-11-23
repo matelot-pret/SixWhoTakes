@@ -15,6 +15,15 @@ public class Row<T extends Comparable<T>> implements RowInterface<T> {
         queue = null;
         nbItems = 0;
     }
+
+    public Cell getHead() {
+        return head;
+    }
+
+    public Cell getQueue() {
+        return queue;
+    }
+
     /**
      * adds an item at the end of the row preserving the natural ordering of its elements
      * @param item the item to add, the item must not be null
@@ -64,7 +73,11 @@ public class Row<T extends Comparable<T>> implements RowInterface<T> {
         T[] items = (T[]) new Comparable[nb];//O(1)
 
         for (int i = 0; i < nb; i++) {
-            items[i] = this.remove();
+            try {
+                items[i] = this.remove();
+            }catch (EmptyException ex){
+                //ne fait rien
+            }
         }//O(n)
 
         return items;//O(1)
@@ -144,5 +157,10 @@ public class Row<T extends Comparable<T>> implements RowInterface<T> {
         public Cell(T data){
             this.data = data;
         }
+
+        public T getData() {
+            return data;
+        }
+
     }
 }

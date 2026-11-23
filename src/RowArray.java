@@ -8,7 +8,7 @@ public class RowArray<T extends Comparable<T>> implements RowInterface<T>{
 
     private T[] items;
     private int nbItems;// nombre d'éléments dans le tableau. Si nbItems == 0 : le tableau est vide.
-    //le dernier éléments du tableau se trouve toujours à nbItems -1
+    //le dernier éléments du tableau se trouve toujours à nbItems -1. nbItems >= items.length
 
     public RowArray(int capacite){
         items = (T[]) new Comparable[capacite];
@@ -75,7 +75,11 @@ public class RowArray<T extends Comparable<T>> implements RowInterface<T>{
 
         T[] tab = (T[]) new Comparable[nb];//O(1)
         for(int i = 0; i < nb; i++){
-            tab[i] = this.remove();
+            try {
+                items[i] = this.remove();
+            }catch (EmptyException ex){
+                //ne fait rien
+            }
         }////O(1) si nb == 0 sinon O(n)
 
         return tab;//O(1)
